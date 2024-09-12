@@ -1,102 +1,132 @@
-// Set up Audio Context
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Fading Example</title>
+    <style>
+        #controls {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sound Fading Based on Player Distance</h1>
+    <div id="controls">
+        <button onclick="movePlayer(-1, 0)">Move Left</button>
+        <button onclick="movePlayer(1, 0)">Move Right</button>
+        <button onclick="movePlayer(0, -1)">Move Up</button>
+        <button onclick="movePlayer(0, 1)">Move Down</button>
+        <p>Player Position: <span id="playerPosition">(0, 0)</span></p>
+    </div>
 
-// Function to load sound
-async function loadSound(url) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    return await audioContext.decodeAudioData(arrayBuffer);
-}
+    <script>
+        // Set up Audio Context
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-// Sound class to manage each sound source
-class Sound {
-    constructor(buffer, position, radius) {
-        this.buffer = buffer;
-        this.position = position;
-        this.radius = radius;
-        this.source = null;
-        this.gainNode = audioContext.createGain();
-        this.gainNode.connect(audioContext.destination);
-    }
-
-    // Start playing the sound
-    play() {
-        if (this.source) return; // Prevent multiple starts
-
-        this.source = audioContext.createBufferSource();
-        this.source.buffer = this.buffer;
-        this.source.loop = true; // Loop sound if needed
-        this.source.connect(this.gainNode);
-        this.source.start();
-    }
-
-    // Update gain based on player distance
-    updateGain(playerPosition) {
-        const distance = Math.hypot(
-            playerPosition.x - this.position.x,
-            playerPosition.y - this.position.y
-        );
-
-        let gainValue = 0;
-        if (distance < this.radius) {
-            gainValue = 1 - (distance / this.radius); // Linear fade
+        // Function to load sound
+        async function loadSound(url) {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            return await audioContext.decodeAudioData(arrayBuffer);
         }
 
-        // Smoothly adjust the gain
-        this.gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.1);
-    }
+        // Sound class to manage each sound source
+        class Sound {
+            constructor(buffer, position, radius) {
+                this.buffer = buffer;
+                this.position = position;
+                this.radius = radius;
+                this.source = null;
+                this.gainNode = audioContext.createGain();
+                this.gainNode.connect(audioContext.destination);
+            }
 
-    // Stop the sound
-    stop() {
-        if (this.source) {
-            this.source.stop();
-            this.source.disconnect();
-            this.source = null;
+            // Start playing the sound
+            play() {
+                if (this.source) return; // Prevent multiple starts
+
+                this.source = audioContext.createBufferSource();
+                this.source.buffer = this.buffer;
+                this.source.loop = true; // Loop sound if needed
+                this.source.connect(this.gainNode);
+                this.source.start();
+            }
+
+            // Update gain based on player distance
+            updateGain(playerPosition) {
+                const distance = Math.hypot(
+                    playerPosition.x - this.position.x,
+                    playerPosition.y - this.position.y
+                );
+
+                let gainValue = 0;
+                if (distance < this.radius) {
+                    gainValue = 1 - (distance / this.radius); // Linear fade
+                }
+
+                // Smoothly adjust the gain
+                this.gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.1);
+            }
+
+            // Stop the sound
+            stop() {
+                if (this.source) {
+                    this.source.stop();
+                    this.source.disconnect();
+                    this.source = null;
+                }
+            }
         }
-    }
-}
 
-// Function to initialize and play all sounds
-async function initializeSounds(soundConfigs) {
-    const sounds = [];
+        // Function to initialize and play all sounds
+        async function initializeSounds(soundConfigs) {
+            const sounds = [];
 
-    for (const config of soundConfigs) {
-        const buffer = await loadSound(config.url);
-        const sound = new Sound(buffer, config.position, config.radius);
-        sound.play();
-        sounds.push(sound);
-    }
+            for (const config of soundConfigs) {
+                const buffer = await loadSound(config.url);
+                const sound = new Sound(buffer, config.position, config.radius);
+                sound.play();
+                sounds.push(sound);
+            }
 
-    return sounds;
-}
+            return sounds;
+        }
 
-// Update all sounds based on player position
-function updateSounds(sounds, playerPosition) {
-    sounds.forEach(sound => sound.updateGain(playerPosition));
-}
+        // Update all sounds based on player position
+        function updateSounds(sounds, playerPosition) {
+            sounds.forEach(sound => sound.updateGain(playerPosition));
+        }
 
-// Example usage
-(async () => {
-    const soundConfigs = [
-        { url: 'http://www.anycreditcarconnection.net/City01.mp3', position: { x: 30, y: 0 }, radius: 20 },
-        { url: 'http://www.anycreditcarconnection.net/Jungle01.mp3', position: { x: 50, y: 0 }, radius: 15 },
-        // Add more sounds here
-    ];
+        // Example usage
+        let playerPosition = { x: 0, y: 0 }; // Initial player position
+        let sounds = [];
 
-    const sounds = await initializeSounds(soundConfigs);
+        (async () => {
+            const soundConfigs = [
+                { url: 'http://www.anycreditcarconnection.net/Jungle01.mp3', position: { x: 10, y: 0 }, radius: 20 },
+                { url: 'http://www.anycreditcarconnection.net/Hounds02.mp3', position: { x: 30, y: 0 }, radius: 15 },
+ 		{ url: 'http://www.anycreditcarconnection.net/City01.mp3', position: { x: 50, y: 0 }, radius: 15 },
+		{ url: 'http://www.anycreditcarconnection.net/mob01.mp3', position: { x: 70, y: 0 }, radius: 20 }
+                // Add more sounds here
+            ];
 
-    // Mock player movement
-    const playerPosition = { x: 0, y: 0 };
+            sounds = await initializeSounds(soundConfigs);
+            updatePlayerPositionDisplay();
+        })();
 
-    // Update loop for player position
-    function gameLoop() {
-        // Example: update player position here
-        playerPosition.x += 0.1; // Update with actual game logic
+        // Function to update player position
+        function movePlayer(dx, dy) {
+            playerPosition.x += dx;
+            playerPosition.y += dy;
+            updatePlayerPositionDisplay();
+            updateSounds(sounds, playerPosition);
+        }
 
-        updateSounds(sounds, playerPosition);
-
-        requestAnimationFrame(gameLoop);
-    }
-
-    gameLoop();
-})();
+        // Function to update the player position display
+        function updatePlayerPositionDisplay() {
+            document.getElementById('playerPosition').textContent = `(${playerPosition.x}, ${playerPosition.y})`;
+        }
+    </script>
+</body>
+</html>
