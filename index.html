@@ -14,8 +14,8 @@
     <h1>Sound Fading Based on Player Distance (Debug Mode)</h1>
     <div id="controls">
         <button id="startButton">Start Audio</button><br><br>
-        <button onclick="movePlayer(-1, 0)">Move Lef.t</button>
-        <button onclick="movePlayer(1, 0)">Move Right</button>
+        <button onclick="movePlayer(-1, 0)">Move Left</button>
+        <button onclick="movePlayer(1, 0)">Move Rig.ht</button>
         <button onclick="movePlayer(0, -1)">Move Up</button>
         <button onclick="movePlayer(0, 1)">Move Down</button>
         <p>Player Position: <span id="playerPosition">(0, 0)</span></p>
@@ -135,10 +135,10 @@
             }
 
             const soundConfigs = [
-                { url: 'http://www.anycreditcarconnection.net/Jungle01.mp3', position: { x: 10, y: 0 }, radius: 20 },
-                { url: 'http://www.anycreditcarconnection.net/Hounds02.mp3', position: { x: 30, y: 0 }, radius: 15 },
-                { url: 'http://www.anycreditcarconnection.net/City01.mp3', position: { x: 50, y: 0 }, radius: 15 },
-                { url: 'http://www.anycreditcarconnection.net/mob01.mp3', position: { x: 70, y: 0 }, radius: 20 }
+                { url: 'https://microscopicwindow.github.io/Audio/Jungle01.mp3', position: { x: 10, y: 0 }, radius: 20 },
+                { url: 'https://microscopicwindow.github.io/Audio/Hounds02.mp3', position: { x: 30, y: 0 }, radius: 15 },
+                { url: 'https://microscopicwindow.github.io/Audio/City01.mp3', position: { x: 50, y: 0 }, radius: 15 },
+                { url: 'https://microscopicwindow.github.io/Audio/mob01.mp3', position: { x: 70, y: 0 }, radius: 20 }
             ];
 
             sounds = await initializeSounds(soundConfigs);
