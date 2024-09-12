@@ -1,0 +1,102 @@
+// Set up Audio Context
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+// Function to load sound
+async function loadSound(url) {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return await audioContext.decodeAudioData(arrayBuffer);
+}
+
+// Sound class to manage each sound source
+class Sound {
+    constructor(buffer, position, radius) {
+        this.buffer = buffer;
+        this.position = position;
+        this.radius = radius;
+        this.source = null;
+        this.gainNode = audioContext.createGain();
+        this.gainNode.connect(audioContext.destination);
+    }
+
+    // Start playing the sound
+    play() {
+        if (this.source) return; // Prevent multiple starts
+
+        this.source = audioContext.createBufferSource();
+        this.source.buffer = this.buffer;
+        this.source.loop = true; // Loop sound if needed
+        this.source.connect(this.gainNode);
+        this.source.start();
+    }
+
+    // Update gain based on player distance
+    updateGain(playerPosition) {
+        const distance = Math.hypot(
+            playerPosition.x - this.position.x,
+            playerPosition.y - this.position.y
+        );
+
+        let gainValue = 0;
+        if (distance < this.radius) {
+            gainValue = 1 - (distance / this.radius); // Linear fade
+        }
+
+        // Smoothly adjust the gain
+        this.gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.1);
+    }
+
+    // Stop the sound
+    stop() {
+        if (this.source) {
+            this.source.stop();
+            this.source.disconnect();
+            this.source = null;
+        }
+    }
+}
+
+// Function to initialize and play all sounds
+async function initializeSounds(soundConfigs) {
+    const sounds = [];
+
+    for (const config of soundConfigs) {
+        const buffer = await loadSound(config.url);
+        const sound = new Sound(buffer, config.position, config.radius);
+        sound.play();
+        sounds.push(sound);
+    }
+
+    return sounds;
+}
+
+// Update all sounds based on player position
+function updateSounds(sounds, playerPosition) {
+    sounds.forEach(sound => sound.updateGain(playerPosition));
+}
+
+// Example usage
+(async () => {
+    const soundConfigs = [
+        { url: 'http://www.anycreditcarconnection.net/City01.mp3', position: { x: 30, y: 0 }, radius: 20 },
+        { url: 'http://www.anycreditcarconnection.net/Jungle01.mp3', position: { x: 50, y: 0 }, radius: 15 },
+        // Add more sounds here
+    ];
+
+    const sounds = await initializeSounds(soundConfigs);
+
+    // Mock player movement
+    const playerPosition = { x: 0, y: 0 };
+
+    // Update loop for player position
+    function gameLoop() {
+        // Example: update player position here
+        playerPosition.x += 0.1; // Update with actual game logic
+
+        updateSounds(sounds, playerPosition);
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+})();
