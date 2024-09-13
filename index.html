@@ -17,7 +17,7 @@
         <button onclick="movePlayer(-1, 0)">Move Left</button>
         <button onclick="movePlayer(1, 0)">Move Right</button>
         <button onclick="movePlayer(0, -1)">Move U..p</button>
-        <button onclick="movePlayer(0, 1)">Move Down</button>
+        <button onclick="movePlayer(0, 1)">Move Do..wn</button>
         <p>Player Position: <span id="playerPosition">(0, 0)</span></p>
         <div id="log" style="white-space: pre-wrap; background: #f0f0f0; padding: 10px; margin-top: 20px; max-height: 200px; overflow-y: auto;"></div>
     </div>
@@ -137,10 +137,10 @@
             }
 
             const soundConfigs = [
-                { url: 'https://microscopicwindow.github.io/Audio/Jungle01.mp3', position: { x: 10, y: 0 }, radius: 30 },
-                { url: 'https://microscopicwindow.github.io/Audio/Hounds02.mp3', position: { x: 30, y: 0 }, radius: 25 },
-                { url: 'https://microscopicwindow.github.io/Audio/City01.mp3', position: { x: 50, y: 0 }, radius: 35 },
-                { url: 'https://microscopicwindow.github.io/Audio/mob01.mp3', position: { x: 70, y: 0 }, radius: 20 }
+                { url: 'https://microscopicwindow.github.io/Audio/Jungle01.mp3', position: { x: 35, y: 0 }, radius: 30 },
+                { url: 'https://microscopicwindow.github.io/Audio/Hounds02.mp3', position: { x: 75, y: 0 }, radius: 25 },
+                { url: 'https://microscopicwindow.github.io/Audio/City01.mp3', position: { x: 95, y: 0 }, radius: 35 },
+                { url: 'https://microscopicwindow.github.io/Audio/mob01.mp3', position: { x: 110, y: 0 }, radius: 20 }
             ];
 
             sounds = await initializeSounds(soundConfigs);
